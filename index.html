@@ -7,97 +7,158 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-  background: #0d0d1a;
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-  overflow: hidden;
+    background:#fff0f3;
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    overflow:hidden;
 }
-canvas{display:block;width:600px;height:600px;max-width:98vw;max-height:98vw;border-radius:20px}
-.bottom-text{
-  position:fixed;bottom:24px;left:0;right:0;text-align:center;
-  color:rgba(255,255,255,.2);font-size:13px;letter-spacing:3px;z-index:5;
-  font-weight:300;
+canvas{
+    display:block;
+    width:600px;height:600px;
+    max-width:98vw;max-height:98vw;
+}
+.title{
+    position:fixed;top:20px;left:0;right:0;
+    text-align:center;
+    font-size:24px;font-weight:700;
+    color:#c9184a;z-index:10;
+    letter-spacing:2px;
+}
+.counter{
+    position:fixed;top:22px;right:22px;
+    font-size:40px;font-weight:900;
+    color:#ffb3c1;z-index:10;
+    font-family:"PingFang SC",sans-serif;
+}
+.footer{
+    position:fixed;bottom:28px;left:0;right:0;
+    text-align:center;
+    font-size:14px;color:#590d22;z-index:10;
+    opacity:0.4;letter-spacing:1px;
 }
 </style>
 </head>
 <body>
 
+<div class="title">💕 韩舒雨想你了</div>
+<div class="counter" id="counter">0</div>
+<div class="footer">💕 一个一个弹出来，堆成一颗心</div>
+
 <canvas id="c"></canvas>
-<div class="bottom-text">💕 100 次想念，拼成一颗心</div>
 
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-function resize(){
-  const s = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.85, 600);
-  canvas.width = s * window.devicePixelRatio;
-  canvas.height = s * window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  canvas.style.width = s + 'px';
-  canvas.style.height = s + 'px';
-  return s;
+// ── 100 个爱心坐标（跟 Python 版一样的算法） ──
+const COUNT = 100;
+const TEXT = '韩舒雨想你了';
+const points = [];
+for (let i = 0; i < COUNT; i++) {
+    const t = 2 * Math.PI * i / COUNT;
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+    const seed = i * 12345 + 6789;
+    const jx = (Math.sin(seed) * 4 + Math.cos(seed * 3) * 4) * 0.5;
+    const jy = (Math.cos(seed * 2) * 4 + Math.sin(seed * 5) * 4) * 0.5;
+    points.push({
+        x: 300 + x * 16 + jx,
+        y: 330 - y * 16 + jy
+    });
 }
 
-const points = [(302.8, 252.1), (297.1, 251.5), (304.2, 248.5), (299.6, 239.1), (301.8, 227.4), (308.5, 222.6), (315.1, 212.1), (318.4, 195.0), (326.4, 189.5), (339.1, 173.2), (352.6, 163.0), (365.9, 154.9), (381.9, 148.4), (397.2, 143.5), (414.0, 141.1), (439.3, 135.7), (453.0, 142.4), (472.4, 150.6), (487.1, 157.7), (507.2, 169.4), (523.5, 181.5), (529.9, 196.4), (546.3, 208.3), (553.4, 232.3), (556.2, 249.8), (555.0, 269.4), (556.5, 282.8), (551.2, 306.0), (539.5, 320.4), (533.0, 340.9), (520.5, 358.7), (501.9, 375.1), (486.3, 393.3), (472.8, 413.5), (454.3, 429.6), (435.9, 447.0), (415.7, 464.6), (400.6, 472.9), (383.2, 490.6), (364.0, 504.9), (351.7, 523.0), (338.4, 531.3), (329.7, 542.5), (316.1, 559.8), (312.0, 569.4), (305.7, 578.6), (307.0, 586.0), (300.5, 592.8), (300.9, 595.2), (296.6, 600.3), (300.0, 600.1), (297.9, 601.0), (303.3, 594.6), (299.3, 596.5), (299.4, 583.9), (289.2, 582.3), (291.0, 569.6), (276.6, 559.0), (272.0, 544.0), (258.4, 537.0), (246.5, 520.6), (233.7, 506.3), (221.3, 488.6), (200.4, 474.5), (182.7, 461.8), (163.8, 443.3), (142.5, 428.4), (124.3, 414.6), (112.3, 399.1), (95.7, 375.0), (83.1, 358.7), (66.0, 343.1), (54.0, 324.2), (48.2, 304.4), (48.4, 285.3), (43.6, 265.5), (44.5, 250.7), (52.4, 227.3), (59.9, 207.9), (64.5, 193.6), (78.0, 180.4), (94.3, 166.8), (107.5, 156.4), (127.7, 151.0), (147.8, 145.9), (162.0, 140.6), (185.2, 135.8), (198.0, 139.6), (217.1, 144.6), (230.3, 155.3), (245.6, 160.4), (257.3, 171.6), (270.7, 186.3), (283.5, 197.7), (287.6, 206.5), (294.5, 220.8), (295.0, 233.8), (295.9, 241.2), (298.3, 247.5), (299.2, 246.3)];
+const COLORS = ["#c9184a","#a4133c","#800f2f","#e63946","#d90429","#ef233c","#ff4d6d","#e63946"];
 
-const allColors = ['#ff4d6d', '#ff6b6b', '#ff8e8e', '#ffb3b3', '#c9184a', '#a4133c', '#ff4d6d', '#800f2f'];
+let currentIndex = 0;
+let tick = 0;
 let frame = 0;
+const itemAnim = new Array(COUNT).fill(0);
 
-function draw(){
-  const s = resize();
-  const ratio = s / 600;
-  ctx.clearRect(0,0,s,s);
+function resize() {
+    const size = Math.min(window.innerWidth * 0.92, window.innerHeight * 0.8, 580);
+    canvas.width = size * window.devicePixelRatio;
+    canvas.height = size * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    return size;
+}
 
-  // 绘制柔和连接线（爱心轮廓更清晰）
-  ctx.beginPath();
-  ctx.strokeStyle = 'rgba(255,77,109,0.06)';
-  ctx.lineWidth = 1;
-  for(let i=0; i<points.length; i++){
-    for(let j=i+1; j<points.length; j++){
-      const dx = points[i][0]*ratio - points[j][0]*ratio;
-      const dy = points[i][1]*ratio - points[j][1]*ratio;
-      if(dx*dx + dy*dy < 2500){
-        ctx.moveTo(points[i][0]*ratio, points[i][1]*ratio);
-        ctx.lineTo(points[j][0]*ratio, points[j][1]*ratio);
-      }
+function draw() {
+    const size = resize();
+    const ratio = size / 600;
+    ctx.clearRect(0, 0, size, size);
+
+    // 每 3 帧弹出一个
+    tick++;
+    if (tick >= 3 && currentIndex < COUNT) {
+        tick = 0;
+        itemAnim[currentIndex] = 0.001;
+        currentIndex++;
+        document.getElementById('counter').textContent = currentIndex;
     }
-  }
-  ctx.stroke();
 
-  // 绘制 100 个「韩舒雨想你了」
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.shadowColor = '#ff4d6d';
+    // 画连线（已出现的点之间）
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(201,24,74,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < currentIndex; i++) {
+        for (let j = i + 1; j < currentIndex; j++) {
+            const dx = points[i].x * ratio - points[j].x * ratio;
+            const dy = points[i].y * ratio - points[j].y * ratio;
+            if (dx*dx + dy*dy < 2500) {
+                ctx.moveTo(points[i].x * ratio, points[i].y * ratio);
+                ctx.lineTo(points[j].x * ratio, points[j].y * ratio);
+            }
+        }
+    }
+    ctx.stroke();
 
-  const glow = 0.5 + 0.5 * Math.sin(frame * 0.03);
+    // 画每个「韩舒雨想你了」
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-  for(let i=0; i<points.length; i++){
-    const x = points[i][0] * ratio;
-    const y = points[i][1] * ratio;
-    const color = allColors[i % allColors.length];
+    for (let i = 0; i < currentIndex; i++) {
+        const px = points[i].x * ratio;
+        const py = points[i].y * ratio;
+        const color = COLORS[i % COLORS.length];
 
-    // 每个文字大小微不同，更有层次
-    const size = 9 + 3 * Math.sin(frame * 0.05 + i * 0.5) + 2;
-    const fontSize = Math.max(8, Math.min(16, size * (s / 600)));
+        // 弹出动画进度
+        if (itemAnim[i] < 1) itemAnim[i] = Math.min(1, itemAnim[i] + 0.035);
+        const p = itemAnim[i];
 
-    ctx.shadowBlur = 12 * glow;
-    ctx.shadowColor = color;
-    ctx.font = `${fontSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
-    ctx.fillStyle = color;
-    ctx.fillText('韩舒雨想你了', x, y);
+        // 弹跳缩放
+        let sc = 1;
+        if (p < 0.2) sc = 0.3 + 3.5 * p;
+        else if (p < 0.35) sc = 1 + 0.35 * Math.sin((p - 0.2) / 0.15 * Math.PI);
 
-    // 再画一次微偏移的亮色叠加，制造发光感
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillText('韩舒雨想你了', x-0.5, y-0.5);
-  }
+        const breathe = 1.5 * Math.sin(frame * 0.025 + i * 0.8);
+        const fontSize = Math.max(9, Math.min(17, (11 + breathe) * sc * (size / 600)));
 
-  frame++;
-  requestAnimationFrame(draw);
+        ctx.font = `bold ${fontSize}px "PingFang SC","Microsoft YaHei",sans-serif`;
+
+        // 白色描边（清晰可读）
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 2.5;
+        ctx.strokeText(TEXT, px, py);
+
+        // 主色
+        ctx.fillStyle = color;
+        ctx.fillText(TEXT, px, py);
+
+        // 发光
+        if (p < 0.5) {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = color;
+            ctx.fillText(TEXT, px, py);
+        }
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
 }
 
 draw();
