@@ -3,107 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💕 选择你想的人</title>
+<title>💕 韩舒雨想你了</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-    background: linear-gradient(135deg, #fff0f3 0%, #ffe5ec 50%, #ffd6e0 100%);
+    background:#fff0f3;
     min-height:100dvh;
     display:flex;
     justify-content:center;
     align-items:center;
     font-family:"PingFang SC","Microsoft YaHei",sans-serif;
     overflow:hidden;
-    padding:20px;
-}
-.pick-page{
-    text-align:center;
-    max-width:500px;
-    width:100%;
-}
-.pick-page h1{
-    font-size:32px;
-    color:#c9184a;
-    margin-bottom:8px;
-}
-.pick-page .sub{
-    color:#590d22;
-    opacity:0.6;
-    font-size:16px;
-    margin-bottom:36px;
-}
-.namelist{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-}
-.name-btn{
-    display:block;
-    width:100%;
-    padding:20px;
-    border:2px solid #ffccd5;
-    border-radius:16px;
-    background:rgba(255,255,255,0.7);
-    font-size:22px;
-    font-weight:600;
-    color:#c9184a;
-    cursor:pointer;
-    transition:all .2s;
-    font-family:inherit;
-    letter-spacing:4px;
-    backdrop-filter:blur(4px);
-    -webkit-tap-highlight-color:transparent;
-}
-.name-btn:hover{
-    background:#fff;
-    border-color:#c9184a;
-    transform:scale(1.02);
-    box-shadow:0 4px 20px rgba(201,24,74,0.15);
-}
-.name-btn:active{
-    transform:scale(0.98);
-}
-.love-page{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:#fff0f3;
-}
-.love-page.show{
-    display:block;
-}
-.back-btn{
-    position:fixed;
-    top:16px;
-    left:16px;
-    z-index:20;
-    background:rgba(255,255,255,0.8);
-    border:1px solid #ffccd5;
-    border-radius:50%;
-    width:44px;
-    height:44px;
-    font-size:22px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#c9184a;
-    transition:all .2s;
-    -webkit-tap-highlight-color:transparent;
-}
-.back-btn:active{
-    background:#fff;
-    transform:scale(0.92);
 }
 canvas{
     display:block;
     width:600px;height:600px;
     max-width:98vw;max-height:98vw;
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%);
 }
-.heart-title{
+.title{
     position:fixed;top:20px;left:0;right:0;
     text-align:center;
     font-size:24px;font-weight:700;
@@ -118,7 +35,7 @@ canvas{
     font-family:"PingFang SC",sans-serif;
     pointer-events:none;
 }
-.heart-footer{
+.footer{
     position:fixed;bottom:28px;left:0;right:0;
     text-align:center;
     font-size:14px;color:#590d22;z-index:10;
@@ -129,61 +46,18 @@ canvas{
 </head>
 <body>
 
-<!-- ====== 选择页面 ====== -->
-<div class="pick-page" id="pickPage">
-    <h1>💕 你想谁了？</h1>
-    <div class="sub">选一个名字，生成专属爱心</div>
-    <div class="namelist">
-        <button class="name-btn" data-name="韩舒雨">韩舒雨 💖</button>
-        <button class="name-btn" data-name="张寒">张寒 💗</button>
-        <button class="name-btn" data-name="刘文璟">刘文璟 💘</button>
-        <button class="name-btn" data-name="刘慧敏">刘慧敏 💝</button>
-    </div>
-</div>
+<div class="title">💕 韩舒雨想你了</div>
+<div class="counter" id="counter">0</div>
+<div class="footer">💕 一个一个弹出来，堆成一颗心</div>
 
-<!-- ====== 爱心动画页面 ====== -->
-<div class="love-page" id="lovePage">
-    <button class="back-btn" id="backBtn">←</button>
-    <div class="heart-title" id="heartTitle">💕 XXX想你了</div>
-    <div class="counter" id="counter">0</div>
-    <div class="heart-footer">💕 一个一个弹出来，堆成一颗心</div>
-    <canvas id="c"></canvas>
-</div>
+<canvas id="c"></canvas>
 
 <script>
-// ─── 名字选择 ───────────────────────────────────────────────
-let selectedName = '';
-const pickPage = document.getElementById('pickPage');
-const lovePage = document.getElementById('lovePage');
-const heartTitle = document.getElementById('heartTitle');
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
-const counter = document.getElementById('counter');
-const backBtn = document.getElementById('backBtn');
 
-document.querySelectorAll('.name-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        selectedName = btn.dataset.name;
-        heartTitle.textContent = `💕 ${selectedName}想你了`;
-        pickPage.style.display = 'none';
-        lovePage.classList.add('show');
-        startHeart();
-    });
-});
-
-backBtn.addEventListener('click', () => {
-    lovePage.classList.remove('show');
-    pickPage.style.display = 'block';
-    // 重置动画
-    currentIndex = 0;
-    tick = 0;
-    frame = 0;
-    itemAnim.fill(0);
-    document.getElementById('counter').textContent = '0';
-});
-
-// ─── 爱心动画 ───────────────────────────────────────────────
 const COUNT = 100;
+const TEXT = '韩舒雨想你了';
 const points = [];
 for (let i = 0; i < COUNT; i++) {
     const t = 2 * Math.PI * i / COUNT;
@@ -202,8 +76,6 @@ const COLORS = ["#c9184a","#a4133c","#800f2f","#e63946","#d90429","#ef233c","#ff
 let currentIndex = 0;
 let tick = 0;
 let frame = 0;
-let animRunning = false;
-let animId = null;
 const itemAnim = new Array(COUNT).fill(0);
 
 function resize() {
@@ -217,21 +89,18 @@ function resize() {
 }
 
 function draw() {
-    if (!animRunning) return;
     const size = resize();
     const ratio = size / 600;
     ctx.clearRect(0, 0, size, size);
 
-    // 每 3 帧弹出一个
     tick++;
     if (tick >= 3 && currentIndex < COUNT) {
         tick = 0;
         itemAnim[currentIndex] = 0.001;
         currentIndex++;
-        counter.textContent = currentIndex;
+        document.getElementById('counter').textContent = currentIndex;
     }
 
-    // 连线
     ctx.beginPath();
     ctx.strokeStyle = 'rgba(201,24,74,0.04)';
     ctx.lineWidth = 1;
@@ -247,10 +116,8 @@ function draw() {
     }
     ctx.stroke();
 
-    // 绘制文字
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    const text = `${selectedName}想你了`;
 
     for (let i = 0; i < currentIndex; i++) {
         const px = points[i].x * ratio;
@@ -271,43 +138,23 @@ function draw() {
 
         ctx.strokeStyle = 'rgba(255,255,255,0.5)';
         ctx.lineWidth = 2.5;
-        ctx.strokeText(text, px, py);
+        ctx.strokeText(TEXT, px, py);
 
         ctx.fillStyle = color;
-        ctx.fillText(text, px, py);
+        ctx.fillText(TEXT, px, py);
 
         if (p < 0.5) {
             ctx.shadowBlur = 10;
             ctx.shadowColor = color;
-            ctx.fillText(text, px, py);
+            ctx.fillText(TEXT, px, py);
         }
     }
 
     frame++;
-    animId = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
 }
 
-function startHeart() {
-    currentIndex = 0;
-    tick = 0;
-    frame = 0;
-    itemAnim.fill(0);
-    counter.textContent = '0';
-    animRunning = true;
-    draw();
-}
-
-// 页面可见性变化时保持动画
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        if (animId) cancelAnimationFrame(animId);
-    } else {
-        if (lovePage.classList.contains('show')) {
-            animRunning = true;
-            draw();
-        }
-    }
-});
+draw();
 </script>
 </body>
 </html>
